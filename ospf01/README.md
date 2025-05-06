@@ -53,6 +53,7 @@ C>* 192.168.21.0/24 is directly connected, eth2, 00:01:07
 ```
 
 pc12-1⇒pc21-1の通信ルートは以下である。
+<img src="images/topology1.png">
 ```
 $ docker compose exec -it pc12-1 /bin/sh
 / # traceroute 192.168.21.101
