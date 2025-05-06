@@ -14,7 +14,7 @@ docker compose up --build
 ```
 
 ## 解説
-起動して数分後、OSPFで経路が広告される。
+起動して数分後、OSPFで経路が広告される。<br>
 例として、技術部のr21ルータでは以下のルートが作成される。
 ```
 $ docker compose exec -it r21 /bin/sh
@@ -80,6 +80,7 @@ abr12(config-if)# exit
 ```
 
 pc12-1⇒pc21-1の通信ルートが以下に切り替わる。
+<img src="images/topology2.png">
 ```
 / # traceroute 192.168.21.101
 traceroute to 192.168.21.101 (192.168.21.101), 30 hops max, 46 byte packets
