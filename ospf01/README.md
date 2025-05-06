@@ -83,6 +83,7 @@ abr12(config-if)# exit
 pc12-1⇒pc21-1の通信ルートが以下に切り替わる。
 <img src="images/topology2.png">
 ```
+$ docker compose exec -it pc12-1 /bin/sh
 / # traceroute 192.168.21.101
 traceroute to 192.168.21.101 (192.168.21.101), 30 hops max, 46 byte packets
  1  r12.ospf01_pc12 (192.168.12.254)  0.007 ms  0.002 ms  0.002 ms
@@ -96,6 +97,12 @@ traceroute to 192.168.21.101 (192.168.21.101), 30 hops max, 46 byte packets
 技術部のr21ルータのルーティングテーブルも変化する。<br>
 （192.168.12.0/24宛てのルートが変わっていることを確認）
 ```
+$ docker compose exec -it r21 /bin/sh
+/ # vtysh
+
+Hello, this is FRRouting (version 7.5_git).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
 r21# show ip route
 Codes: K - kernel route, C - connected, S - static, R - RIP,
        O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
