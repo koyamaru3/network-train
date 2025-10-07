@@ -2,7 +2,7 @@
 
 ## 概要
 Linux環境内で複数のPCとルータをdockerコンテナで作成し、OSPFでルーティング情報をOSPFで動的に作成するデモ環境。<br>
-ルータはLinux上で動作するFRR（コンテナ版）を使用し、docker composeコマンド一発でデモ環境を作成する。
+ルータはLinux上で動作するFRR（コンテナ版）を使用する。
 
 ## ネットワーク構成
 <img src="images/topology.png">
