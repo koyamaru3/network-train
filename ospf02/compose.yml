@@ -7,8 +7,8 @@ services:
     stdin_open: true
     privileged: true
     networks:
-      pc11:
-        ipv4_address: 192.168.11.101
+      pc11net:
+        ipv4_address: 10.1.11.101
   pc11-2:
     build: ./pc11-2
     container_name: pc11-2
@@ -17,8 +17,8 @@ services:
     stdin_open: true
     privileged: true
     networks:
-      pc11:
-        ipv4_address: 192.168.11.102
+      pc11net:
+        ipv4_address: 10.1.11.102
   pc12-1:
     build: ./pc12-1
     container_name: pc12-1
@@ -27,8 +27,8 @@ services:
     stdin_open: true
     privileged: true
     networks:
-      pc12:
-        ipv4_address: 192.168.12.101
+      pc12net:
+        ipv4_address: 10.1.12.101
   pc12-2:
     build: ./pc12-2
     container_name: pc12-2
@@ -37,8 +37,8 @@ services:
     stdin_open: true
     privileged: true
     networks:
-      pc12:
-        ipv4_address: 192.168.12.102
+      pc12net:
+        ipv4_address: 10.1.12.102
   pc21-1:
     build: ./pc21-1
     container_name: pc21-1
@@ -47,8 +47,8 @@ services:
     stdin_open: true
     privileged: true
     networks:
-      pc21:
-        ipv4_address: 192.168.21.101
+      pc21net:
+        ipv4_address: 10.2.21.101
   pc21-2:
     build: ./pc21-2
     container_name: pc21-2
@@ -57,8 +57,8 @@ services:
     stdin_open: true
     privileged: true
     networks:
-      pc21:
-        ipv4_address: 192.168.21.102
+      pc21net:
+        ipv4_address: 10.2.21.102
 
   r01:
     build: ./r01
@@ -103,8 +103,8 @@ services:
         ipv4_address: 10.1.1.2
       net12:
         ipv4_address: 10.1.2.2
-      pc11:
-        ipv4_address: 192.168.11.254
+      pc11net:
+        ipv4_address: 10.1.11.254
     depends_on:
       - "pc11-1"
       - "pc11-2"
@@ -120,8 +120,8 @@ services:
         ipv4_address: 10.1.3.2
       net14:
         ipv4_address: 10.1.4.2
-      pc12:
-        ipv4_address: 192.168.12.254
+      pc12net:
+        ipv4_address: 10.1.12.254
     depends_on:
       - "abr11"
       - "abr12"
@@ -136,8 +136,8 @@ services:
         ipv4_address: 10.2.1.2
       net22:
         ipv4_address: 10.2.2.2
-      pc21:
-        ipv4_address: 192.168.21.254
+      pc21net:
+        ipv4_address: 10.2.21.254
     depends_on:
       - "pc21-1"
       - "pc21-2"
@@ -201,18 +201,18 @@ services:
         ipv4_address: 10.0.92.2
 
 networks:
-  pc11:
+  pc11net:
     ipam:
       config:
-        - subnet: 192.168.11.0/24
-  pc12:
+        - subnet: 10.1.11.0/24
+  pc12net:
     ipam:
       config:
-        - subnet: 192.168.12.0/24
-  pc21:
+        - subnet: 10.1.12.0/24
+  pc21net:
     ipam:
       config:
-        - subnet: 192.168.21.0/24
+        - subnet: 10.2.21.0/24
 
   net01:
     ipam:
