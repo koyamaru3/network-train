@@ -1,12 +1,37 @@
-# OSPF練習
-PCとルータ(frr)をdockerコンテナで作成し、ルーティング情報をOSPFで動的に作成するデモ。
+# OSPF練習 その2
 
-## ネットワーク構成図
+## 概要
+Linux環境内で複数のPCとルータをdockerコンテナで作成し、OSPFでルーティング情報をOSPFで動的に作成するデモ環境。<br>
+ルータはLinux上で動作するFRR（コンテナ版）を使用し、docker composeコマンド一発でデモ環境を作成する。
+
+## ネットワーク構成
 <img src="images/topology.png">
 
-- 部署ごとにエリアを分ける（営業部⇒エリア1、技術部⇒エリア2）
-- 中継ルータは単一障害点とならないよう冗長化
-- 営業部の斜めの経路は低優先（コスト値=500を設定）
+- 数百人規模の企業ネットワークを想定し、部署ごとにOSPFのエリアを分ける（営業部⇒エリア1、技術部⇒エリア2）
+- エリア1とエリア2はバックボーン(エリア0)でつなげる
+- それぞれの中継ルータは単一障害点とならないよう冗長化
+- 営業部の斜めの経路は低優先ルート（コスト値=500を設定）
+- AS間通信用にASBRも設置（今回は使わない）
+
+### 各PCの設定
+
+- PCを接続するルータをデフォルトGWとして設定
+```
+route add default gw 10.1.11.254
+```
+
+### 各ルータの設定
+
+- ループバックIFにユニークなIPアドレスを設定（今回は使わない）
+- 接続するネットワークアドレスとエリア番号を設定
+```
+# 以下はabr11の設定内容
+router ospf
+ network 10.1.1.0/24 area 1
+ network 10.1.3.0/24 area 1
+ network 10.0.1.0/24 area 0
+ router-info area
+```
 
 ## 起動方法
 ```
@@ -56,7 +81,7 @@ C>* 10.2.21.0/24 is directly connected, eth2, 00:01:54
 pc12-1⇒pc21-1の通信ルートは以下である。
 <img src="images/topology1.png">
 
-
+pc12-1上でtracerouteを実行すると、図の通りにルーティングされることがわかる。
 ```
 $ docker compose exec -it abr12 /bin/sh
 / # traceroute 10.2.21.101
@@ -145,4 +170,74 @@ C>* 10.2.21.0/24 is directly connected, eth2, 00:11:04
 
 ```
 docker compose up --build
+```
+
+## ルータの設定内容
+
+### r11
+```
+frr version 8.4.1_git
+frr defaults traditional
+hostname r11
+no ipv6 forwarding
+service integrated-vtysh-config
+!
+interface lo
+ ip address 1.1.1.11/32
+!
+router ospf
+ network 10.1.11.0/24 area 1
+ network 10.1.1.0/24 area 1
+ network 10.1.2.0/24 area 1
+ router-info area
+!
+line vty
+!
+interface eth1
+ ip ospf cost 500
+!
+```
+
+### abr11
+```
+frr version 8.4.1_git
+frr defaults traditional
+hostname abr11
+no ipv6 forwarding
+service integrated-vtysh-config
+!
+interface lo
+ ip address 0.0.0.11/32
+!
+router ospf
+ network 10.1.1.0/24 area 1
+ network 10.1.3.0/24 area 1
+ network 10.0.1.0/24 area 0
+ router-info area
+!
+line vty
+!
+interface eth2
+ ip ospf cost 500
+!
+```
+
+### asbr01
+```
+frr version 8.4.1_git
+frr defaults traditional
+hostname asbr01
+no ipv6 forwarding
+service integrated-vtysh-config
+!
+interface lo
+ ip address 0.0.0.101/32
+!
+router ospf
+ network 10.0.91.0/24 area 0
+ network 10.0.92.0/24 area 0
+ router-info area
+!
+line vty
+!
 ```
