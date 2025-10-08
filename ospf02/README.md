@@ -216,7 +216,7 @@ line vty
 ```
 
 ### asbr01
-```cisco_ios
+```RouterOS Script
 frr version 8.4.1_git
 frr defaults traditional
 hostname asbr01
