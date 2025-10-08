@@ -111,7 +111,7 @@ pc12-1⇒pc21-1の通信ルートが以下に切り替わる。
 <img src="images/topology2.png">
 
 pc12-1上でtracerouteを実行すると、図の通りにルーティングが変更されたことがわかる。
-```
+```Shell
 $ docker compose exec -it pc12-1 /bin/sh
 / # traceroute 10.2.21.101
 traceroute to 10.2.21.101 (10.2.21.101), 30 hops max, 46 byte packets
@@ -172,7 +172,7 @@ docker compose up --build
 ## ルータの設定内容
 
 ### r11
-```cisco_ios
+```
 frr version 8.4.1_git
 frr defaults traditional
 hostname r11
@@ -196,7 +196,7 @@ interface eth1
 ```
 
 ### abr11
-```cisco_ios
+```
 frr version 8.4.1_git
 frr defaults traditional
 hostname abr21
@@ -216,7 +216,7 @@ line vty
 ```
 
 ### asbr01
-```RouterOS Script
+```
 frr version 8.4.1_git
 frr defaults traditional
 hostname asbr01
