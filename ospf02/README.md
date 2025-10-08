@@ -111,7 +111,7 @@ pc12-1⇒pc21-1の通信ルートが以下に切り替わる。
 <img src="images/topology2.png">
 
 pc12-1上でtracerouteを実行すると、図の通りにルーティングが変更されたことがわかる。
-```Shell
+```
 $ docker compose exec -it pc12-1 /bin/sh
 / # traceroute 10.2.21.101
 traceroute to 10.2.21.101 (10.2.21.101), 30 hops max, 46 byte packets
