@@ -78,8 +78,8 @@ services:
       pc12net:
         ipv4_address: 10.1.12.254
     depends_on:
-      - "abr11"
-      - "abr12"
+      - "pc12-1"
+      - "pc12-2"
       - "r01"
 
 
