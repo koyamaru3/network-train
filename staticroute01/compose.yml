@@ -66,7 +66,7 @@ services:
     depends_on:
       - "pc11-1"
       - "pc11-2"
-      - "r01"
+
   r12:
     build: ./r12
     container_name: r12
@@ -80,8 +80,6 @@ services:
     depends_on:
       - "pc12-1"
       - "pc12-2"
-      - "r01"
-
 
 networks:
   pc11net:
