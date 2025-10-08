@@ -34,15 +34,17 @@ router ospf
 ```
 
 ## 起動方法
-```
+```Shell
 docker compose up --build
 ```
 
 ## 解説
 起動して数分後、OSPFで経路が広告される。<br>
 例として、技術部のr21ルータでは以下のルートが作成される。
-```
+```Shell
 $ docker compose exec -it r21 /bin/sh
+```
+```
 / # vtysh
 
 Hello, this is FRRouting (version 8.4.1_git).
@@ -81,8 +83,10 @@ pc12-1⇒pc21-1の通信ルートは以下である。
 <img src="images/topology1.png">
 
 pc12-1上でtracerouteを実行すると、図の通りにルーティングされることがわかる。
-```
+```Shell
 $ docker compose exec -it pc12-1 /bin/sh
+```
+```
 / # traceroute 10.2.21.101
 traceroute to 10.2.21.101 (10.2.21.101), 30 hops max, 46 byte packets
  1  r12.ospf02_pc12net (10.1.12.254)  0.010 ms  0.003 ms  0.004 ms
@@ -94,8 +98,10 @@ traceroute to 10.2.21.101 (10.2.21.101), 30 hops max, 46 byte packets
 ```
 
 経路切り替えの実験として、経路上のabr12の10.1.4.0のインタフェースをシャットダウンさせる。
-```
+```Shell
 $ docker compose exec -it abr12 /bin/sh
+```
+```
 / # vtysh
 
 Hello, this is FRRouting (version 8.4.1_git).
@@ -111,8 +117,10 @@ pc12-1⇒pc21-1の通信ルートが以下に切り替わる。
 <img src="images/topology2.png">
 
 pc12-1上でtracerouteを実行すると、図の通りにルーティングが変更されたことがわかる。
-```
+```Shell
 $ docker compose exec -it pc12-1 /bin/sh
+```
+```
 / # traceroute 10.2.21.101
 traceroute to 10.2.21.101 (10.2.21.101), 30 hops max, 46 byte packets
  1  r12.ospf02_pc12net (10.1.12.254)  0.008 ms  0.003 ms  0.003 ms
@@ -125,8 +133,10 @@ traceroute to 10.2.21.101 (10.2.21.101), 30 hops max, 46 byte packets
 
 技術部のr21ルータのルーティングテーブルも変化する。<br>
 （10.1.12.0/24宛てのルートが変わっていることを確認）
-```
+```Shell
 $ docker compose exec -it r21 /bin/sh
+```
+```
 / # vtysh
 
 Hello, this is FRRouting (version 8.4.1_git).
@@ -165,7 +175,7 @@ C>* 10.2.21.0/24 is directly connected, eth2, 00:05:57
 
 コンテナを起動したターミナルをCtrl+Cで止め、以下を実行する。
 
-```
+```Shell
 docker compose up --build
 ```
 
