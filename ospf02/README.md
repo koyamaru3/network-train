@@ -56,26 +56,25 @@ Codes: K - kernel route, C - connected, S - static, R - RIP,
        > - selected route, * - FIB route, q - queued, r - rejected, b - backup
        t - trapped, o - offload failure
 
-K>* 0.0.0.0/0 [0/0] via 10.2.1.1, eth0, 00:01:54
-C>* 2.2.2.21/32 is directly connected, lo, 00:01:54
-O>* 10.0.1.0/24 [110/30] via 10.2.1.254, eth0, weight 1, 00:01:00
-O>* 10.0.2.0/24 [110/20] via 10.2.1.254, eth0, weight 1, 00:01:04
-O>* 10.0.3.0/24 [110/30] via 10.2.2.254, eth1, weight 1, 00:01:00
-O>* 10.0.4.0/24 [110/20] via 10.2.2.254, eth1, weight 1, 00:01:04
-O>* 10.0.91.0/24 [110/30] via 10.2.1.254, eth0, weight 1, 00:01:00
-O>* 10.0.92.0/24 [110/30] via 10.2.2.254, eth1, weight 1, 00:01:00
-O>* 10.1.1.0/24 [110/40] via 10.2.1.254, eth0, weight 1, 00:01:00
-O>* 10.1.2.0/24 [110/530] via 10.2.2.254, eth1, weight 1, 00:00:54
-O>* 10.1.3.0/24 [110/530] via 10.2.1.254, eth0, weight 1, 00:01:00
-O>* 10.1.4.0/24 [110/40] via 10.2.2.254, eth1, weight 1, 00:00:54
-O>* 10.1.11.0/24 [110/50] via 10.2.1.254, eth0, weight 1, 00:01:00
-O>* 10.1.12.0/24 [110/50] via 10.2.2.254, eth1, weight 1, 00:00:54
-O   10.2.1.0/24 [110/10] is directly connected, eth0, weight 1, 00:01:54
-C>* 10.2.1.0/24 is directly connected, eth0, 00:01:54
-O   10.2.2.0/24 [110/10] is directly connected, eth1, weight 1, 00:01:54
-C>* 10.2.2.0/24 is directly connected, eth1, 00:01:54
-O   10.2.21.0/24 [110/10] is directly connected, eth2, weight 1, 00:01:54
-C>* 10.2.21.0/24 is directly connected, eth2, 00:01:54
+K>* 0.0.0.0/0 [0/0] via 10.2.1.1, eth0, 00:00:58
+O>* 10.0.1.0/24 [110/30] via 10.2.1.254, eth0, weight 1, 00:00:04
+O>* 10.0.2.0/24 [110/20] via 10.2.1.254, eth0, weight 1, 00:00:08
+O>* 10.0.3.0/24 [110/30] via 10.2.2.254, eth1, weight 1, 00:00:08
+O>* 10.0.4.0/24 [110/20] via 10.2.2.254, eth1, weight 1, 00:00:08
+O>* 10.0.101.0/24 [110/30] via 10.2.1.254, eth0, weight 1, 00:00:04
+O>* 10.0.102.0/24 [110/30] via 10.2.2.254, eth1, weight 1, 00:00:08
+O>* 10.1.1.0/24 [110/40] via 10.2.1.254, eth0, weight 1, 00:00:04
+O>* 10.1.2.0/24 [110/530] via 10.2.2.254, eth1, weight 1, 00:00:08
+O>* 10.1.3.0/24 [110/530] via 10.2.1.254, eth0, weight 1, 00:00:04
+O>* 10.1.4.0/24 [110/40] via 10.2.2.254, eth1, weight 1, 00:00:08
+O>* 10.1.11.0/24 [110/50] via 10.2.1.254, eth0, weight 1, 00:00:04
+O>* 10.1.12.0/24 [110/50] via 10.2.2.254, eth1, weight 1, 00:00:08
+O   10.2.1.0/24 [110/10] is directly connected, eth0, weight 1, 00:00:58
+C>* 10.2.1.0/24 is directly connected, eth0, 00:00:58
+O   10.2.2.0/24 [110/10] is directly connected, eth1, weight 1, 00:00:58
+C>* 10.2.2.0/24 is directly connected, eth1, 00:00:58
+O   10.2.21.0/24 [110/10] is directly connected, eth2, weight 1, 00:00:58
+C>* 10.2.21.0/24 is directly connected, eth2, 00:00:58
 ```
 
 pc12-1⇒pc21-1の通信ルートは以下である。
@@ -83,15 +82,15 @@ pc12-1⇒pc21-1の通信ルートは以下である。
 
 pc12-1上でtracerouteを実行すると、図の通りにルーティングされることがわかる。
 ```
-$ docker compose exec -it abr12 /bin/sh
+$ docker compose exec -it pc12-1 /bin/sh
 / # traceroute 10.2.21.101
 traceroute to 10.2.21.101 (10.2.21.101), 30 hops max, 46 byte packets
- 1  r12.ospf02_pc12net (10.1.12.254)  0.012 ms  0.006 ms  0.002 ms
- 2  10.1.4.254 (10.1.4.254)  0.004 ms  0.005 ms  0.004 ms
- 3  10.0.3.2 (10.0.3.2)  0.004 ms  0.006 ms  0.003 ms
- 4  10.0.4.254 (10.0.4.254)  0.005 ms  0.004 ms  0.004 ms
- 5  10.2.2.2 (10.2.2.2)  0.030 ms  0.003 ms  0.003 ms
- 6  10.2.21.101 (10.2.21.101)  0.003 ms  0.002 ms  0.003 ms
+ 1  r12.ospf02_pc12net (10.1.12.254)  0.010 ms  0.003 ms  0.004 ms
+ 2  10.1.4.254 (10.1.4.254)  0.003 ms  0.006 ms  0.004 ms
+ 3  10.0.3.2 (10.0.3.2)  0.005 ms  0.004 ms  0.003 ms
+ 4  10.0.4.254 (10.0.4.254)  0.004 ms  0.005 ms  0.003 ms
+ 5  10.2.2.2 (10.2.2.2)  0.004 ms  0.003 ms  0.003 ms
+ 6  10.2.21.101 (10.2.21.101)  0.003 ms  0.003 ms  0.002 ms
 ```
 
 経路切り替えの実験として、経路上のabr12の10.1.4.0のインタフェースをシャットダウンさせる。
@@ -116,13 +115,12 @@ pc12-1上でtracerouteを実行すると、図の通りにルーティングが�
 $ docker compose exec -it pc12-1 /bin/sh
 / # traceroute 10.2.21.101
 traceroute to 10.2.21.101 (10.2.21.101), 30 hops max, 46 byte packets
- 1  r12.ospf02_pc12net (10.1.12.254)  0.007 ms  0.005 ms  0.003 ms
- 2  10.1.3.254 (10.1.3.254)  0.004 ms  0.004 ms  0.005 ms
- 3  10.0.1.2 (10.0.1.2)  0.003 ms  0.004 ms  0.003 ms
- 4  10.0.2.254 (10.0.2.254)  0.004 ms  0.004 ms  0.004 ms
- 5  10.2.1.2 (10.2.1.2)  0.004 ms  0.005 ms  0.004 ms
- 6  10.2.21.101 (10.2.21.101)  0.003 ms  0.002 ms  0.003 ms
-
+ 1  r12.ospf02_pc12net (10.1.12.254)  0.008 ms  0.003 ms  0.003 ms
+ 2  10.1.3.254 (10.1.3.254)  0.003 ms  0.006 ms  0.004 ms
+ 3  10.0.1.2 (10.0.1.2)  0.004 ms  0.005 ms  0.005 ms
+ 4  10.0.2.254 (10.0.2.254)  0.005 ms  0.004 ms  0.003 ms
+ 5  10.2.1.2 (10.2.1.2)  0.003 ms  0.004 ms  0.002 ms
+ 6  10.2.21.101 (10.2.21.101)  0.002 ms  0.003 ms  0.003 ms
 ```
 
 技術部のr21ルータのルーティングテーブルも変化する。<br>
@@ -142,26 +140,25 @@ Codes: K - kernel route, C - connected, S - static, R - RIP,
        > - selected route, * - FIB route, q - queued, r - rejected, b - backup
        t - trapped, o - offload failure
 
-K>* 0.0.0.0/0 [0/0] via 10.2.1.1, eth0, 00:11:04
-C>* 2.2.2.21/32 is directly connected, lo, 00:11:04
-O>* 10.0.1.0/24 [110/30] via 10.2.1.254, eth0, weight 1, 00:10:10
-O>* 10.0.2.0/24 [110/20] via 10.2.1.254, eth0, weight 1, 00:10:14
-O>* 10.0.3.0/24 [110/30] via 10.2.2.254, eth1, weight 1, 00:10:10
-O>* 10.0.4.0/24 [110/20] via 10.2.2.254, eth1, weight 1, 00:10:14
-O>* 10.0.91.0/24 [110/30] via 10.2.1.254, eth0, weight 1, 00:10:10
-O>* 10.0.92.0/24 [110/30] via 10.2.2.254, eth1, weight 1, 00:10:10
-O>* 10.1.1.0/24 [110/40] via 10.2.1.254, eth0, weight 1, 00:10:10
-O>* 10.1.2.0/24 [110/530] via 10.2.2.254, eth1, weight 1, 00:10:04
-O>* 10.1.3.0/24 [110/530] via 10.2.1.254, eth0, weight 1, 00:10:10
-O>* 10.1.4.0/24 [110/540] via 10.2.1.254, eth0, weight 1, 00:03:44
-O>* 10.1.11.0/24 [110/50] via 10.2.1.254, eth0, weight 1, 00:10:10
-O>* 10.1.12.0/24 [110/540] via 10.2.1.254, eth0, weight 1, 00:04:21
-O   10.2.1.0/24 [110/10] is directly connected, eth0, weight 1, 00:11:04
-C>* 10.2.1.0/24 is directly connected, eth0, 00:11:04
-O   10.2.2.0/24 [110/10] is directly connected, eth1, weight 1, 00:11:04
-C>* 10.2.2.0/24 is directly connected, eth1, 00:11:04
-O   10.2.21.0/24 [110/10] is directly connected, eth2, weight 1, 00:11:04
-C>* 10.2.21.0/24 is directly connected, eth2, 00:11:04
+K>* 0.0.0.0/0 [0/0] via 10.2.1.1, eth0, 00:05:57
+O>* 10.0.1.0/24 [110/30] via 10.2.1.254, eth0, weight 1, 00:05:03
+O>* 10.0.2.0/24 [110/20] via 10.2.1.254, eth0, weight 1, 00:05:07
+O>* 10.0.3.0/24 [110/30] via 10.2.2.254, eth1, weight 1, 00:05:07
+O>* 10.0.4.0/24 [110/20] via 10.2.2.254, eth1, weight 1, 00:05:07
+O>* 10.0.101.0/24 [110/30] via 10.2.1.254, eth0, weight 1, 00:05:03
+O>* 10.0.102.0/24 [110/30] via 10.2.2.254, eth1, weight 1, 00:05:07
+O>* 10.1.1.0/24 [110/40] via 10.2.1.254, eth0, weight 1, 00:05:03
+O>* 10.1.2.0/24 [110/530] via 10.2.2.254, eth1, weight 1, 00:05:07
+O>* 10.1.3.0/24 [110/530] via 10.2.1.254, eth0, weight 1, 00:05:03
+O>* 10.1.4.0/24 [110/540] via 10.2.1.254, eth0, weight 1, 00:01:25
+O>* 10.1.11.0/24 [110/50] via 10.2.1.254, eth0, weight 1, 00:05:03
+O>* 10.1.12.0/24 [110/540] via 10.2.1.254, eth0, weight 1, 00:01:25
+O   10.2.1.0/24 [110/10] is directly connected, eth0, weight 1, 00:05:57
+C>* 10.2.1.0/24 is directly connected, eth0, 00:05:57
+O   10.2.2.0/24 [110/10] is directly connected, eth1, weight 1, 00:05:57
+C>* 10.2.2.0/24 is directly connected, eth1, 00:05:57
+O   10.2.21.0/24 [110/10] is directly connected, eth2, weight 1, 00:05:57
+C>* 10.2.21.0/24 is directly connected, eth2, 00:05:57
 ```
 
 ## 後片付け
@@ -183,7 +180,7 @@ no ipv6 forwarding
 service integrated-vtysh-config
 !
 interface lo
- ip address 1.1.1.11/32
+ ip address 0.0.0.11/32
 !
 router ospf
  network 10.1.11.0/24 area 1
@@ -202,23 +199,19 @@ interface eth1
 ```
 frr version 8.4.1_git
 frr defaults traditional
-hostname abr11
+hostname abr21
 no ipv6 forwarding
 service integrated-vtysh-config
 !
 interface lo
- ip address 0.0.0.11/32
+ ip address 1.1.1.21/32
 !
 router ospf
- network 10.1.1.0/24 area 1
- network 10.1.3.0/24 area 1
- network 10.0.1.0/24 area 0
+ network 10.2.1.0/24 area 2
+ network 10.0.2.0/24 area 0
  router-info area
 !
 line vty
-!
-interface eth2
- ip ospf cost 500
 !
 ```
 
@@ -231,11 +224,11 @@ no ipv6 forwarding
 service integrated-vtysh-config
 !
 interface lo
- ip address 0.0.0.101/32
+ ip address 2.2.2.1/32
 !
 router ospf
- network 10.0.91.0/24 area 0
- network 10.0.92.0/24 area 0
+ network 10.0.101.0/24 area 0
+ network 10.0.102.0/24 area 0
  router-info area
 !
 line vty
