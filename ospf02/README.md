@@ -179,7 +179,7 @@ C>* 10.2.21.0/24 is directly connected, eth2, 00:05:57
 docker compose up --build
 ```
 
-## ルータの設定内容
+## （補足）ルータの設定内容
 
 ### r11
 ```
