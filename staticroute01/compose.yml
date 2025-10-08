@@ -1,0 +1,103 @@
+services:
+  pc11-1:
+    build: ./pc11-1
+    container_name: pc11-1
+    hostname: pc11-1
+    tty: true
+    stdin_open: true
+    privileged: true
+    networks:
+      pc11net:
+        ipv4_address: 10.1.11.101
+  pc11-2:
+    build: ./pc11-2
+    container_name: pc11-2
+    hostname: pc11-2
+    tty: true
+    stdin_open: true
+    privileged: true
+    networks:
+      pc11net:
+        ipv4_address: 10.1.11.102
+  pc12-1:
+    build: ./pc12-1
+    container_name: pc12-1
+    hostname: pc12-1
+    tty: true
+    stdin_open: true
+    privileged: true
+    networks:
+      pc12net:
+        ipv4_address: 10.1.12.101
+  pc12-2:
+    build: ./pc12-2
+    container_name: pc12-2
+    hostname: pc12-2
+    tty: true
+    stdin_open: true
+    privileged: true
+    networks:
+      pc12net:
+        ipv4_address: 10.1.12.102
+  r01:
+    build: ./r01
+    container_name: r01
+    hostname: r01
+    privileged: true
+    networks:
+      net11:
+        ipv4_address: 10.1.1.254
+      net12:
+        ipv4_address: 10.1.2.254
+    depends_on:
+      - "r11"
+      - "r12"
+
+  r11:
+    build: ./r11
+    container_name: r11
+    hostname: r11
+    privileged: true
+    networks:
+      net11:
+        ipv4_address: 10.1.1.2
+      pc11net:
+        ipv4_address: 10.1.11.254
+    depends_on:
+      - "pc11-1"
+      - "pc11-2"
+      - "r01"
+  r12:
+    build: ./r12
+    container_name: r12
+    hostname: r12
+    privileged: true
+    networks:
+      net12:
+        ipv4_address: 10.1.2.2
+      pc12net:
+        ipv4_address: 10.1.12.254
+    depends_on:
+      - "abr11"
+      - "abr12"
+      - "r01"
+
+
+networks:
+  pc11net:
+    ipam:
+      config:
+        - subnet: 10.1.11.0/24
+  pc12net:
+    ipam:
+      config:
+        - subnet: 10.1.12.0/24
+
+  net11:
+    ipam:
+      config:
+        - subnet: 10.1.1.0/24
+  net12:
+    ipam:
+      config:
+        - subnet: 10.1.2.0/24
