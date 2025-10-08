@@ -172,7 +172,7 @@ docker compose up --build
 ## ルータの設定内容
 
 ### r11
-```
+```cisco_ios
 frr version 8.4.1_git
 frr defaults traditional
 hostname r11
@@ -196,7 +196,7 @@ interface eth1
 ```
 
 ### abr11
-```
+```cisco_ios
 frr version 8.4.1_git
 frr defaults traditional
 hostname abr21
@@ -216,7 +216,7 @@ line vty
 ```
 
 ### asbr01
-```
+```cisco_ios
 frr version 8.4.1_git
 frr defaults traditional
 hostname asbr01
