@@ -91,9 +91,18 @@ r01(config)# exit
 r01# 
 ```
 
+スタティックルートの設定後、再度End-End間（今回はpc11-1とpc12-1の間）のping確認を行うと成功する。
 
-
-
+```Shell
+docker exec -it pc11-1 /bin/sh
+```
+```
+/ # ping 10.1.12.101
+PING 10.1.12.101 (10.1.12.101): 56 data bytes
+64 bytes from 10.1.12.101: seq=0 ttl=61 time=2.333 ms
+64 bytes from 10.1.12.101: seq=1 ttl=61 time=0.432 ms
+64 bytes from 10.1.12.101: seq=2 ttl=61 time=0.340 ms
+```
 
 ## 後片付け
 
@@ -105,7 +114,42 @@ docker compose up --build
 
 ## （補足）ルータの設定内容
 
+### r01
+```
+frr version 8.4.1_git
+frr defaults traditional
+hostname r01
+no ipv6 forwarding
+service integrated-vtysh-config
+!
+ip route 10.1.11.0/24 10.1.1.2
+ip route 10.1.12.0/24 10.1.2.2
+!
+end
+```
+
 ### r11
 ```
-・・・
+frr version 8.4.1_git
+frr defaults traditional
+hostname r11
+no ipv6 forwarding
+service integrated-vtysh-config
+!
+ip route 10.1.12.0/24 10.1.1.254
+!
+end
+```
+
+### r12
+```
+frr version 8.4.1_git
+frr defaults traditional
+hostname r12
+no ipv6 forwarding
+service integrated-vtysh-config
+!
+ip route 10.1.11.0/24 10.1.2.254
+!
+end
 ```
