@@ -1,7 +1,8 @@
 # スタティックルート練習
 
 ## 概要
-・・・
+スタティックルート設定を追加することでEnd-End間の通信を成功させるデモ。<br>
+ルータはLinux上で動作するFRR（コンテナ版）を使用する。
 
 ## ネットワーク構成
 <img src="images/topology.png">
@@ -16,7 +17,7 @@ docker compose up --build
 
 ## 解説
 
-適切なスタティックルート設定を行うことで、End-End間（今回はpc11-1とpc12-1の間）のping確認を成功させる。
+初期状態では各ルータにスタティックルートの設定がないため、End-End間（今回はpc11-1とpc12-1の間）のping確認が失敗する。
 
 ```Shell
 docker exec -it pc11-1 /bin/sh
