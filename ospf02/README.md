@@ -40,6 +40,7 @@ router ospf
 ```
 
 ## 起動方法
+以下を実行し、PCとルータを一斉起動させる。
 ```Shell
 docker compose up --build
 ```
