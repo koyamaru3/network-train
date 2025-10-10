@@ -28,11 +28,15 @@ route add default gw 10.1.11.254
 - OSPFの広告対象（ルータに接続しているネットワークアドレスとエリア番号）を設定
 ```
 # 以下はabr11の設定内容
+interface lo
+ ip address 1.1.1.11/24
+!
 router ospf
  network 10.1.1.0/24 area 1
  network 10.1.3.0/24 area 1
  network 10.0.1.0/24 area 0
  router-info area
+!
 ```
 
 ## 起動方法
@@ -216,11 +220,12 @@ no ipv6 forwarding
 service integrated-vtysh-config
 !
 interface lo
- ip address 1.1.1.21/32
+ ip address 1.1.1.11/32
 !
 router ospf
- network 10.2.1.0/24 area 2
- network 10.0.2.0/24 area 0
+ network 10.1.1.0/24 area 1
+ network 10.1.3.0/24 area 1
+ network 10.0.1.0/24 area 0
  router-info area
 !
 line vty
