@@ -35,7 +35,8 @@ TRAIN_NIC=enp0s5
 ```
 
 ## ネットワーク構成
-下図の通り、Dockerコンテナで作成した2台のPCを同一の仮想ネットワーク上で接続します。
+下図の通り、Dockerコンテナで作成した2台のPCを同一の仮想ネットワーク上で接続します。<br>
+<br>
 <img src="images/topology.png">
 
 ## 動作確認
