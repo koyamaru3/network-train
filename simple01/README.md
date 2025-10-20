@@ -39,7 +39,7 @@ TRAIN_NIC=enp0s5
 <img src="images/topology.png">
 
 ## 動作確認
-解説は後回しにして、先に動作確認を行います。<br>
+解説は後回しにして、先にpingの動作確認を行ってみます。<br>
 <br>
 以下を実行し、PCを一斉起動させます。
 ```Shell
