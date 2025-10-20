@@ -10,7 +10,7 @@
 - OS: Ubuntu22.04.5 LTS
 - Docker: version 27.5.1
 
-## 資材のダウンロード
+## 資材のダウンロードと環境設定
 任意のディレクトリ上でgit cloneします。
 
 ```Shell
@@ -20,6 +20,17 @@ git clone https://github.com/koyamaru3/network-train.git
 今回使用する資材へ移動します。
 ```Shell
 cd network-train/simple01
+```
+
+環境設定ファイルを編集します。
+```
+vi .env
+```
+
+TRANS_NICにPCのネットワークインタフェース名を設定します。<br>
+インタフェース名は ip addrコマンドで確認できます（通常はloインタフェースの次に表示されたインタフェース。ここでは例としてenp0s5を設定します）
+```INI
+TRAIN_NIC=enp0s5
 ```
 
 ## ネットワーク構成
