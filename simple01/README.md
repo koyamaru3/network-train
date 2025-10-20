@@ -131,6 +131,7 @@ $ ip addr
        valid_lft forever preferred_lft forever
 ```
 
+
 ```Shell
 parallels@ubuntu02:~$ sudo tcpdump -i enp0s5 -nn
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
