@@ -6,9 +6,9 @@
 最初はDockerコンテナで作成した２台のPC間でping確認を行い、徐々に練習環境を拡張していきます。
 
 ### 動作環境
-PC: Appleシリコン搭載のMacbook上のVM
-OS: Ubuntu22.04.5 LTS
-Docker: version 27.5.1
+- PC: Appleシリコン搭載のMacbook上のVM
+- OS: Ubuntu22.04.5 LTS
+- Docker: version 27.5.1
 
 ## 資材のダウンロード
 任意のディレクトリ上でgit cloneします。
