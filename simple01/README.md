@@ -34,11 +34,13 @@ TRANS_NICにPCのネットワークインタフェース名を設定します。
 ```INI
 TRAIN_NIC=enp0s5
 ```
+<br>
 
 ## ネットワーク構成
 下図の通り、Dockerコンテナで作成した2台のPCを同一の仮想ネットワーク上で接続します。<br>
 <br>
 <img src="images/topology.png">
+<br>
 
 ## 動作確認
 解説は後回しにして、先にpingの動作確認を行ってみます。<br>
@@ -66,6 +68,7 @@ PING 10.1.1.102 (10.1.1.102): 56 data bytes
 ```
 docker compose down
 ```
+<br>
 
 ## 解説
 
