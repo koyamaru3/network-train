@@ -1,6 +1,6 @@
 services:
   pc1:
-    build: ./pc1
+    image: alpine:latest
     container_name: pc1
     hostname: pc1
     tty: true
@@ -9,8 +9,9 @@ services:
     networks:
       vlan1:
         ipv4_address: 10.1.1.101
+        mac_address: "02:42:ac:00:01:01"
   pc2:
-    build: ./pc2
+    image: alpine:latest
     container_name: pc2
     hostname: pc2
     tty: true
@@ -19,6 +20,7 @@ services:
     networks:
       vlan1:
         ipv4_address: 10.1.1.102
+        mac_address: "02:42:ac:00:01:02"
 
 networks:
   vlan1:
@@ -28,4 +30,4 @@ networks:
     ipam:
       config:
         - subnet: 10.1.1.0/24
-          gateway: 10.1.1.254
+          gateway: 10.1.1.1
