@@ -47,7 +47,7 @@ TRAIN_NIC=enp0s5
 <br>
 以下を実行し、PCを一斉起動させます。
 ```Shell
-docker compose up --build
+./up.sh
 ```
 
 別のターミナルを開き、pc1のコンテナに入ってpingを実行します。
@@ -66,7 +66,7 @@ PING 10.1.1.102 (10.1.1.102): 56 data bytes
 
 終了する際は、コンテナを起動したターミナルをCtrl+Cし、以下を実行して後片付けします。
 ```
-docker compose down
+./down.sh
 ```
 <br>
 
