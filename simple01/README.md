@@ -75,7 +75,7 @@ docker compose down
 ```YML
 services:
   pc1:
-    build: ./pc1
+    image: alpine:latest
     container_name: pc1
     hostname: pc1
     tty: true
@@ -84,8 +84,9 @@ services:
     networks:
       vlan1:
         ipv4_address: 10.1.1.101
+        mac_address: "02:42:ac:00:01:01"
   pc2:
-    build: ./pc2
+    image: alpine:latest
     container_name: pc2
     hostname: pc2
     tty: true
@@ -94,6 +95,7 @@ services:
     networks:
       vlan1:
         ipv4_address: 10.1.1.102
+        mac_address: "02:42:ac:00:01:02"
 
 networks:
   vlan1:
@@ -103,7 +105,7 @@ networks:
     ipam:
       config:
         - subnet: 10.1.1.0/24
-          gateway: 10.1.1.254
+          gateway: 10.1.1.1
 ```
 
 ```Shell
@@ -117,9 +119,9 @@ $ ip addr
 2: enp0s5: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
     link/ether 00:1c:42:97:2b:40 brd ff:ff:ff:ff:ff:ff
     inet 10.211.55.6/24 metric 100 brd 10.211.55.255 scope global dynamic enp0s5
-       valid_lft 1377sec preferred_lft 1377sec
+       valid_lft 1743sec preferred_lft 1743sec
     inet6 fdb2:2c26:f4e4:0:21c:42ff:fe97:2b40/64 scope global dynamic mngtmpaddr noprefixroute 
-       valid_lft 2591682sec preferred_lft 604482sec
+       valid_lft 2591911sec preferred_lft 604711sec
     inet6 fe80::21c:42ff:fe97:2b40/64 scope link 
        valid_lft forever preferred_lft forever
 4: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
@@ -130,7 +132,7 @@ $ ip addr
     link/ether 02:42:02:fc:33:c3 brd ff:ff:ff:ff:ff:ff
 13: br-171dfefd0e3f: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
     link/ether 02:42:44:9e:ff:e1 brd ff:ff:ff:ff:ff:ff
-2400: enp0s5.1@enp0s5: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+2408: enp0s5.1@enp0s5: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
     link/ether 00:1c:42:97:2b:40 brd ff:ff:ff:ff:ff:ff
     inet6 fe80::21c:42ff:fe97:2b40/64 scope link 
        valid_lft forever preferred_lft forever
