@@ -2,31 +2,7 @@
 
 ## 概要
 初回の演習として、今回はDockerコンテナで作成した2台のPC間でping確認を行います。
-
-
-## 資材のダウンロードと環境設定
-任意のディレクトリ上でgit cloneします。
-
-```Shell
-git clone https://github.com/koyamaru3/network-train.git
-```
-
-今回使用する資材へ移動します。
-```Shell
-cd network-train/simple01
-```
-
-環境設定ファイルを編集します。
-```
-vi .env
-```
-
-TRANS_NICにPCの物理インタフェース名を設定します。
-インタフェース名は ip addrコマンドで確認できます。
-（通常はloインタフェースの次に表示されるインタフェースが該当。ここでは例としてenp0s5を設定します。）
-```INI
-TRAIN_NIC=enp0s5
-```
+ 
 <br>
 
 ## ネットワーク構成
@@ -41,6 +17,7 @@ TRAIN_NIC=enp0s5
  
 以下を実行し、PCを一斉起動させます。
 ```Shell
+cd simple01
 ./up.sh
 ```
 
