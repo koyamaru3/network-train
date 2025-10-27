@@ -1,0 +1,75 @@
+services:
+  pc1:
+    image: alpine:latest
+    container_name: pc1
+    hostname: pc1
+    tty: true
+    stdin_open: true
+    privileged: true
+    networks:
+      vlan1:
+        ipv4_address: 10.1.1.101
+        mac_address: "02:42:ac:00:01:01"
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ip route del default via 10.1.1.253
+        ip route add default via 10.1.1.1
+        tail -f /dev/null
+    depends_on:
+      - "r1"
+  pc2:
+    image: alpine:latest
+    container_name: pc2
+    hostname: pc2
+    tty: true
+    stdin_open: true
+    privileged: true
+    networks:
+      vlan1:
+        ipv4_address: 10.1.1.102
+        mac_address: "02:42:ac:00:01:02"
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ip route del default via 10.1.1.253
+        ip route add default via 10.1.1.1
+        tail -f /dev/null
+    depends_on:
+      - "r1"
+  r1:
+    image: frrouting/frr:v8.4.1
+    container_name: r1
+    hostname: r1
+    privileged: true
+    volumes:
+      - ./conf/daemons:/etc/frr/daemons:ro
+      - ./conf/vtysh.conf:/etc/frr/vtysh.conf:ro
+      - ./conf/r1_frr.conf:/etc/frr/frr.conf:ro
+    networks:
+      vlan1:
+        ipv4_address: 10.1.1.1
+        mac_address: "02:42:ac:00:01:11"
+      exnet:
+        ipv4_address: ${EXNET_IF}
+
+networks:
+  vlan1:
+    driver: macvlan
+    driver_opts:
+      parent: ${TRAIN_NIC}.1
+    ipam:
+      config:
+        - subnet: 10.1.1.0/24
+          gateway: 10.1.1.253
+  exnet:
+    driver: macvlan
+    driver_opts:
+      parent: ${TRAIN_NIC}
+    ipam:
+      config:
+        - subnet: ${EXNET}
+          gateway: ${EXNET_GW}
+
