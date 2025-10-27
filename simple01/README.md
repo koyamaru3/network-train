@@ -1,7 +1,7 @@
 # シンプルなネットワークの構築 その1
 
 ## 概要
-初回の演習として、今回はDockerコンテナで作成した2台のPC間でping確認を行います。
+初回の演習として、Dockerコンテナで作成した2台のPC間でping確認を行います。
  
 <br>
 
@@ -35,7 +35,7 @@ PING 10.1.1.102 (10.1.1.102): 56 data bytes
 64 bytes from 10.1.1.102: seq=2 ttl=64 time=0.112 ms
 ```
 
-終了する際は、コンテナを起動したターミナルをCtrl+Cし、以下を実行して後片付けします。
+終了する際は、コンテナを起動したターミナルをCtrl+Cで止め、以下を実行して後片付けします。
 ```
 ./down.sh
 ```
@@ -44,6 +44,7 @@ PING 10.1.1.102 (10.1.1.102): 56 data bytes
 ## 解説
 
 今回はDockerの機能しか使っていないため、Dockerに関する解説になります。
+ 
 PCを擬似したDockerコンテナと、コンテナが使用するネットワークを以下のcompose.yamlに定義して、up.shスクリプト（中身はdocker compose upコマンド）で一斉起動しました。
 
 ```YML
@@ -87,13 +88,13 @@ compose.yamlは大きく２つのセクションで構成されています。
 | セクション | 内容 |
 |----|----|
 | services | PC2台分のコンテナの定義。<br>各コンテナで接続先のネットワーク（今回はvlan1）を指定します。 |
-| networks | コンテナが接続するネットワークの定義。<br>今回はmacvlan driverでネットワークを作成し、サブネットとゲートウェイも定義します。 |
+| networks | コンテナが接続するネットワークの定義。<br>今回はmacvlan driverで独立したコンテナネットワークを作成し、サブネットとゲートウェイも定義します。 |
 
 macvlan driverを使用した理由は、この後の演習も含め、同一ホスト上で独立したコンテナネットワークを複数作成するため、です。
  
-関連する設定はdriver_opts項目にあります。ここで「parent: ${TRAIN_NIC}.1」と設定することで、ホストの物理インターフェース上のサブインタフェース1に、vlan1という名前のコンテナネットワークが構築されます。
+関連する設定はdriver_opts項目にあります。ここで **parent: ${TRAIN_NIC}.1**と設定することで、ホストPCの物理インターフェース上のサブインタフェース1に、vlan1という名前のコンテナネットワークが構築されます。
 
-この設定でコンテナを起動すると、ホスト上では以下のようにサブインタフェース1（以下の例ではenp0s5.1@enp0s5）が作られているのがわかります。
+この設定でコンテナを起動すると、ホストPC上では以下のようにサブインタフェース1（以下の例ではenp0s5.1@enp0s5）が作られているのがわかります。
 
 ```Shell
 $ ip addr
@@ -136,7 +137,7 @@ PING 10.1.1.102 (10.1.1.102): 56 data bytes
 64 bytes from 10.1.1.102: seq=2 ttl=64 time=0.218 ms
 ```
 
-pingを実行している最中に、別のターミナルでホストのサブインタフェース1を指定してtcpdumpを行ってみます。
+pingを実行している最中に、別のターミナルでホストPCのサブインタフェース1（以下の例ではenp0s5.1）を指定してtcpdumpを行ってみます。
 
 ```Shell
 $ sudo tcpdump -i enp0s5.1 -nn
@@ -152,12 +153,13 @@ listening on enp0s5.1, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 
 コンテナ間のping通信がキャプチャできています。
  
-なおこのサブインタフェース1はホストの物理インタフェースとは独立であるため、ホストの物理インタフェースを指定してtcpdumpしてもping通信は見えません。
+なおこのサブインタフェース1はホストPCの物理インタフェースとは独立であるため、ホストPCの物理インタフェース（以下の例ではenp0s5）を指定してtcpdumpしてもping通信は見えません。
 
 ```Shell
 parallels@ubuntu02:~$ sudo tcpdump -i enp0s5 -nn
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
 listening on enp0s5, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 ```
-
+<br>
+最もシンプルなネットワークが構築できました。次回の演習では2台のPC間にルータを挟んでみます。
 
