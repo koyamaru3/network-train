@@ -1,38 +1,77 @@
 # 2. 仮想ルータを挟んでみる
 
 ## 概要
-前回作成した2台のPC（それぞれDockerコンテナ）間に、Dockerコンテナで作成したルータを挟んでみます。
+前回作成した2台のPC（それぞれDockerコンテナ）間に、Dockerコンテナで作成した仮想ルータを挟んでみます。
 <br>
 
 ## ネットワーク構成
-下図の通り、Dockerコンテナで作成した2台のPCを、他のネットワークから独立したコンテナネットワーク上で接続します。
+2台の擬似PCと同じネットワーク上に、仮想ルータr1を接続します。
  
 <img src="images/topology.png">
  
 <br>
 
 ## 動作確認
-解説は後回しにして、先にpingの動作確認を行ってみます。
- 
-以下を実行し、PCを一斉起動させます。
+以下を実行し、擬似PCと仮想ルータを一斉起動させます。
 ```Shell
-cd simple01
+cd simple02
 ./up.sh
 ```
 
 別のターミナルを開き、pc1のコンテナに入ってpingを実行します。
 ```Shell
-docker compose exec -it pc1 /bin/sh
+docker exec -it pc1 /bin/sh
 ```
 
-pc2宛てにpingを実行すると応答が返ってきます。
+仮想ルータ宛てにpingを実行すると応答が返ってきます。
 ```Shell
-/ # ping 10.1.1.102
-PING 10.1.1.102 (10.1.1.102): 56 data bytes
-64 bytes from 10.1.1.102: seq=0 ttl=64 time=0.388 ms
-64 bytes from 10.1.1.102: seq=1 ttl=64 time=0.170 ms
-64 bytes from 10.1.1.102: seq=2 ttl=64 time=0.112 ms
+/ # ping 10.1.1.1
+PING 10.1.1.1 (10.1.1.1): 56 data bytes
+64 bytes from 10.1.1.1: seq=0 ttl=64 time=1.074 ms
+64 bytes from 10.1.1.1: seq=1 ttl=64 time=0.258 ms
+64 bytes from 10.1.1.1: seq=2 ttl=64 time=0.167 ms
 ```
+
+仮想ルータのコンテナに入り、ルータのインタフェースを確認してみます。
+```Shell
+docker exec -it r1 /bin/sh
+```
+「vtysh」コマンドを実行してコマンドインタフェースを起動し、「show interface」コマンドを実行します。
+```
+/ # vtysh
+
+Hello, this is FRRouting (version 8.4.1_git).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
+r1# show interface 
+Interface eth0 is up, line protocol is up
+  Link ups:       0    last: (never)
+  Link downs:     0    last: (never)
+  vrf: default
+  index 2451 metric 0 mtu 1500 speed 4294967295 
+  flags: <UP,BROADCAST,RUNNING,MULTICAST>
+  Type: Ethernet
+  HWaddr: 02:42:ac:00:01:11
+  inet 10.1.1.1/24
+  Interface Type macvlan
+  Interface Slave Type None
+  protodown: off 
+  Parent ifindex: 2447
+Interface lo is up, line protocol is up
+  Link ups:       0    last: (never)
+  Link downs:     0    last: (never)
+  vrf: default
+  index 1 metric 0 mtu 65536 speed 0 
+  flags: <UP,LOOPBACK,RUNNING>
+  Type: Loopback
+  Interface Type Other
+  Interface Slave Type None
+  protodown: off 
+r1# exit
+/ # 
+```
+
+
 
 終了する際は、コンテナを起動したターミナルをCtrl+Cで止め、以下を実行して後片付けします。
 ```
@@ -42,9 +81,10 @@ PING 10.1.1.102 (10.1.1.102): 56 data bytes
 
 ## 解説
 
-今回はDockerの機能しか使っていないため、Dockerに関する解説になります。
- 
-PCを擬似したDockerコンテナと、コンテナが使用するネットワークを以下のcompose.yamlに定義して、up.shスクリプト（中身はdocker compose upコマンド）で一斉起動しました。
+FRRouting（FRR）という仮想ルータを環境に追加しました。
+FRRはLinux環境で動作するオープンソースのソフトウェアルータで、BGPやOSPFなどの主要なルーティングプロトコルが実装されています。
+
+今回は以下のcompose.yamlを作成して、FRRをDockerコンテナとして起動させています。
 
 ```YML
 services:
@@ -59,6 +99,15 @@ services:
       vlan1:
         ipv4_address: 10.1.1.101
         mac_address: "02:42:ac:00:01:01"
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ip route del default via 10.1.1.253
+        ip route add default via 10.1.1.1
+        tail -f /dev/null
+    depends_on:
+      - "r1"
   pc2:
     image: alpine:latest
     container_name: pc2
@@ -70,6 +119,28 @@ services:
       vlan1:
         ipv4_address: 10.1.1.102
         mac_address: "02:42:ac:00:01:02"
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ip route del default via 10.1.1.253
+        ip route add default via 10.1.1.1
+        tail -f /dev/null
+    depends_on:
+      - "r1"
+  r1:
+    image: frrouting/frr:v8.4.1
+    container_name: r1
+    hostname: r1
+    privileged: true
+    volumes:
+      - ./conf/daemons:/etc/frr/daemons:ro
+      - ./conf/vtysh.conf:/etc/frr/vtysh.conf:ro
+      - ./conf/r1_frr.conf:/etc/frr/frr.conf:ro
+    networks:
+      vlan1:
+        ipv4_address: 10.1.1.1
+        mac_address: "02:42:ac:00:01:11"
 
 networks:
   vlan1:
@@ -79,86 +150,76 @@ networks:
     ipam:
       config:
         - subnet: 10.1.1.0/24
-          gateway: 10.1.1.1
+          gateway: 10.1.1.253
 ```
 
-compose.yamlは大きく２つのセクションで構成されています。
-
-| セクション | 内容 |
-|----|----|
-| services | PC2台分のコンテナの定義。<br>各コンテナで接続先のネットワーク（今回はvlan1）を指定します。 |
-| networks | コンテナが接続するネットワークの定義。<br>今回はmacvlan driverで独立したコンテナネットワークを作成し、サブネットとゲートウェイも定義します。 |
-
-macvlan driverを使用した理由は、この後の演習も含め、同一ホスト上で独立したコンテナネットワークを複数作成するため、です。
+早くもcompose.yamlが巨大化してしまいましたが、順番に少しずつ見ていきたいと思います。
  
-関連する設定はdriver_opts項目にあります。ここで **parent: ${TRAIN_NIC}.1**と設定することで、ホストPCの物理インターフェース上のサブインタフェース1に、vlan1という名前のコンテナネットワークが構築されます。
+```
+networks:
+  vlan1:
+    driver: macvlan
+    driver_opts:
+      parent: ${TRAIN_NIC}.1
+    ipam:
+      config:
+        - subnet: 10.1.1.0/24
+          gateway: 10.1.1.253
+```
+まずネットワークのgatewayを、使用しないIPアドレス（10.1.1.253）に変更しました。前回設定していたIPアドレス（10.1.1.1）をFRRに設定したいため、コンテナネットワークにデフォルトで設定されるゲートウェイアドレスに使用しないIPアドレスを設定しました。
 
-この設定でコンテナを起動すると、ホストPC上では以下のようにサブインタフェース1（以下の例ではenp0s5.1@enp0s5）が作られているのがわかります。
+```
+services:
+  pc1:
 
-```Shell
-$ ip addr
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-    inet 127.0.0.1/8 scope host lo
-       valid_lft forever preferred_lft forever
-    inet6 ::1/128 scope host 
-       valid_lft forever preferred_lft forever
-2: enp0s5: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
-    link/ether 00:1c:42:97:2b:40 brd ff:ff:ff:ff:ff:ff
-    inet 10.211.55.6/24 metric 100 brd 10.211.55.255 scope global dynamic enp0s5
-       valid_lft 1743sec preferred_lft 1743sec
-    inet6 fdb2:2c26:f4e4:0:21c:42ff:fe97:2b40/64 scope global dynamic mngtmpaddr noprefixroute 
-       valid_lft 2591911sec preferred_lft 604711sec
-    inet6 fe80::21c:42ff:fe97:2b40/64 scope link 
-       valid_lft forever preferred_lft forever
-4: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
-    link/ether 02:42:d6:3a:8d:52 brd ff:ff:ff:ff:ff:ff
-8: br-5f195c875120: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
-    link/ether 02:42:c8:8b:5d:f7 brd ff:ff:ff:ff:ff:ff
-11: br-ebd648b5fa24: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
-    link/ether 02:42:02:fc:33:c3 brd ff:ff:ff:ff:ff:ff
-13: br-171dfefd0e3f: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
-    link/ether 02:42:44:9e:ff:e1 brd ff:ff:ff:ff:ff:ff
-2408: enp0s5.1@enp0s5: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
-    link/ether 00:1c:42:97:2b:40 brd ff:ff:ff:ff:ff:ff
-    inet6 fe80::21c:42ff:fe97:2b40/64 scope link 
-       valid_lft forever preferred_lft forever
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ip route del default via 10.1.1.253
+        ip route add default via 10.1.1.1
+        tail -f /dev/null
+```
+これに関連して、擬似PCのデフォルトゲートウェイ設定も、起動時にip routeコマンドで変更しなおしています。
+
+```
+  r1:
+    image: frrouting/frr:v8.4.1
+    container_name: r1
+    hostname: r1
+    privileged: true
+    volumes:
+      - ./conf/daemons:/etc/frr/daemons:ro
+      - ./conf/vtysh.conf:/etc/frr/vtysh.conf:ro
+      - ./conf/r1_frr.conf:/etc/frr/frr.conf:ro
+    networks:
+      vlan1:
+        ipv4_address: 10.1.1.1
+        mac_address: "02:42:ac:00:01:11"
+```
+仮想ルータのFRRは上記の定義で起動しています。
+FRR起動時に3つのファイル「daemons」「vtysh.conf」「frr.conf」が必要ですが、ホストPC側で用意したファイルをマウントして読み込ませています。
+
+先ほどの動作確認の通り、FRRはvtyshというコマンドラインインタフェースを起動することで、Ciscoルータにあるような各種showコマンドを実行できるようになります。
+```
+/ # vtysh
+
+Hello, this is FRRouting (version 8.4.1_git).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
+r1# show running-config 
+Building configuration...
+
+Current configuration:
+!
+frr version 8.4.1_git
+frr defaults traditional
+hostname r1
+no ipv6 forwarding
+service integrated-vtysh-config
+!
+end
 ```
 
-通信の経路を確認するために、2つのPC間でpingを実行してみます。
-```Shell
-$ docker compose exec -it pc1 /bin/sh
-WARN[0000] The "TRAIN_NIC" variable is not set. Defaulting to a blank string. 
-/ # ping 10.1.1.102
-PING 10.1.1.102 (10.1.1.102): 56 data bytes
-64 bytes from 10.1.1.102: seq=0 ttl=64 time=2.594 ms
-64 bytes from 10.1.1.102: seq=1 ttl=64 time=0.263 ms
-64 bytes from 10.1.1.102: seq=2 ttl=64 time=0.218 ms
-```
-
-pingを実行している最中に、別のターミナルでホストPCのサブインタフェース1（以下の例ではenp0s5.1）を指定してtcpdumpを行ってみます。
-
-```Shell
-$ sudo tcpdump -i enp0s5.1 -nn
-tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
-listening on enp0s5.1, link-type EN10MB (Ethernet), snapshot length 262144 bytes
-23:35:05.095951 IP 10.1.1.101 > 10.1.1.102: ICMP echo request, id 22, seq 0, length 64
-23:35:05.096027 IP 10.1.1.102 > 10.1.1.101: ICMP echo reply, id 22, seq 0, length 64
-23:35:06.097768 IP 10.1.1.101 > 10.1.1.102: ICMP echo request, id 22, seq 1, length 64
-23:35:06.097782 IP 10.1.1.102 > 10.1.1.101: ICMP echo reply, id 22, seq 1, length 64
-23:35:07.098328 IP 10.1.1.101 > 10.1.1.102: ICMP echo request, id 22, seq 2, length 64
-23:35:07.098360 IP 10.1.1.102 > 10.1.1.101: ICMP echo reply, id 22, seq 2, length 64
-```
-
-コンテナ間のping通信がキャプチャできています。
- 
-なおこのサブインタフェース1はホストPCの物理インタフェースとは独立であるため、ホストPCの物理インタフェース（以下の例ではenp0s5）を指定してtcpdumpしてもping通信は見えません。
-
-```Shell
-parallels@ubuntu02:~$ sudo tcpdump -i enp0s5 -nn
-tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
-listening on enp0s5, link-type EN10MB (Ethernet), snapshot length 262144 bytes
-```
 <br>
-最もシンプルなネットワークが構築できました。次回の演習では2台のPC間にルータを挟んでみます。
-
+次回はFRRを経由して擬似PCが外部NWへ通信できるようにしてみます。

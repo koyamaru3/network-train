@@ -6,7 +6,7 @@
 <br>
 
 ## ネットワーク構成
-下図の通り、Dockerコンテナで作成した2台のPCを、他のネットワークから独立したコンテナネットワーク上で接続します。
+下図の通り、Dockerコンテナで作成した2台の擬似PCを、他のネットワークから独立したコンテナネットワーク上で接続します。
  
 <img src="images/topology.png">
  
@@ -15,7 +15,7 @@
 ## 動作確認
 解説は後回しにして、先にpingの動作確認を行ってみます。
  
-以下を実行し、PCを一斉起動させます。
+以下を実行し、擬似PCを一斉起動させます。
 ```Shell
 cd simple01
 ./up.sh
@@ -23,7 +23,7 @@ cd simple01
 
 別のターミナルを開き、pc1のコンテナに入ってpingを実行します。
 ```Shell
-docker compose exec -it pc1 /bin/sh
+docker exec -it pc1 /bin/sh
 ```
 
 pc2宛てにpingを実行すると応答が返ってきます。
@@ -128,7 +128,7 @@ $ ip addr
 
 通信の経路を確認するために、2つのPC間でpingを実行してみます。
 ```Shell
-$ docker compose exec -it pc1 /bin/sh
+$ docker exec -it pc1 /bin/sh
 WARN[0000] The "TRAIN_NIC" variable is not set. Defaulting to a blank string. 
 / # ping 10.1.1.102
 PING 10.1.1.102 (10.1.1.102): 56 data bytes
