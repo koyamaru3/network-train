@@ -1,14 +1,15 @@
 # 練習環境の構築 その１
 
 ## 概要
-１台のUbuntu環境上で、Dockerを使ってネットワークの練習環境を構築します。<br>
-あらかじめDockerがインストールされている前提とします。<br>
-最初はDockerコンテナで作成した２台のPC間でping確認を行い、徐々に練習環境を拡張していきます。
+1台のUbuntu環境上で、Dockerを使ってネットワークの練習環境を構築します。
+ 
+初回の演習ではDockerコンテナで作成した2台のPC間でping確認を行い、演習を通じて練習環境を拡張していきます。
 
 ### 動作環境
 - PC: Appleシリコン搭載のMacbook上のVM
 - OS: Ubuntu22.04.5 LTS
-- Docker: version 27.5.1
+- Docker: v27.5.1
+- Docker Compose: v2.32.4
 <br>
 
 ## 資材のダウンロードと環境設定
@@ -28,8 +29,8 @@ cd network-train/simple01
 vi .env
 ```
 
-TRANS_NICにPCのネットワークインタフェース名を設定します。<br>
-インタフェース名は ip addrコマンドで確認できます。<br>
+TRANS_NICにPCの物理インタフェース名を設定します。
+インタフェース名は ip addrコマンドで確認できます。
 （通常はloインタフェースの次に表示されるインタフェースが該当。ここでは例としてenp0s5を設定します。）
 ```INI
 TRAIN_NIC=enp0s5
@@ -37,14 +38,15 @@ TRAIN_NIC=enp0s5
 <br>
 
 ## ネットワーク構成
-下図の通り、Dockerコンテナで作成した2台のPCを同一の仮想ネットワーク上で接続します。<br>
-<br>
+下図の通り、Dockerコンテナで作成した2台のPCを同一の仮想ネットワーク上で接続します。
+ 
 <img src="images/topology.png">
+ 
 <br>
 
 ## 動作確認
-解説は後回しにして、先にpingの動作確認を行ってみます。<br>
-<br>
+解説は後回しにして、先にpingの動作確認を行ってみます。
+ 
 以下を実行し、PCを一斉起動させます。
 ```Shell
 ./up.sh
@@ -52,7 +54,7 @@ TRAIN_NIC=enp0s5
 
 別のターミナルを開き、pc1のコンテナに入ってpingを実行します。
 ```Shell
-docker exec -it pc1 /bin/sh
+docker compose exec -it pc1 /bin/sh
 ```
 
 pc2宛てにpingを実行すると応答が返ってきます。
@@ -71,6 +73,9 @@ PING 10.1.1.102 (10.1.1.102): 56 data bytes
 <br>
 
 ## 解説
+
+今回はDockerの機能しか使っていないため、Dockerに関する解説になります。
+PCを擬似したDockerコンテナと、コンテナが使用するネットワークを以下のcompose.yamlに定義して、up.shスクリプト（中身はdocker compose upコマンド）で一斉起動しました。
 
 ```YML
 services:
@@ -108,6 +113,19 @@ networks:
           gateway: 10.1.1.1
 ```
 
+compose.yamlは大きく２つのセクションで構成されています。
+
+| セクション | 内容 |
+|----|----|
+| services | PC2台分のコンテナの定義。各コンテナで接続先のネットワーク（今回はvlan1）を指定します。 |
+| networks | コンテナが接続するネットワークの定義。今回はmacvlan driverでネットワークを作成し、サブネットとゲートウェイも定義します。 |
+
+macvlan driverを使用した理由は、この後の演習も含め、同一ホスト上で独立したコンテナネットワークを複数作成するため、です。
+ 
+関連する設定はcompose.yamlのnetworksセクションのvlan1に含まれるdriver_opts項目にあります。ここで「parent: ${TRAIN_NIC}.1」と設定することで、ホストの物理インターフェース上のサブインタフェース1に、vlan1という名前のコンテナネットワークが構築されます。
+
+この設定でコンテナを起動すると、ホスト上では以下のようにサブインタフェース1（以下の例ではenp0s5.1@enp0s5）が作られているのがわかります。
+
 ```Shell
 $ ip addr
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
@@ -138,12 +156,18 @@ $ ip addr
        valid_lft forever preferred_lft forever
 ```
 
-
+通信の経路を確認するために、2つのPC間でpingを実行してみます。
 ```Shell
-parallels@ubuntu02:~$ sudo tcpdump -i enp0s5 -nn
-tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
-listening on enp0s5, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+$ docker compose exec -it pc1 /bin/sh
+WARN[0000] The "TRAIN_NIC" variable is not set. Defaulting to a blank string. 
+/ # ping 10.1.1.102
+PING 10.1.1.102 (10.1.1.102): 56 data bytes
+64 bytes from 10.1.1.102: seq=0 ttl=64 time=2.594 ms
+64 bytes from 10.1.1.102: seq=1 ttl=64 time=0.263 ms
+64 bytes from 10.1.1.102: seq=2 ttl=64 time=0.218 ms
 ```
+
+pingを実行している最中に、別のターミナルでホストのサブインタフェース1を指定してtcpdumpを行ってみます。
 
 ```Shell
 $ sudo tcpdump -i enp0s5.1 -nn
@@ -156,4 +180,15 @@ listening on enp0s5.1, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 23:35:07.098328 IP 10.1.1.101 > 10.1.1.102: ICMP echo request, id 22, seq 2, length 64
 23:35:07.098360 IP 10.1.1.102 > 10.1.1.101: ICMP echo reply, id 22, seq 2, length 64
 ```
+
+コンテナ間のping通信がキャプチャできています。
+ 
+なおこのサブインタフェース1はホストの物理インタフェースとは独立であるため、ホストの物理インタフェースを指定してtcpdumpしてもping通信は見えません。
+
+```Shell
+parallels@ubuntu02:~$ sudo tcpdump -i enp0s5 -nn
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on enp0s5, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+```
+
 
