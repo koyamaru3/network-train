@@ -8,7 +8,7 @@
 ## ネットワーク構成
 まだこの段階ではネットワークは意識しません。
  
- 下図の通り、pc1-1という名前のDockerコンテナをVM1にデプロイします。このpc1-1を擬似PCとして今後も使っていきます。
+ 下図の通り、pc1-1という名前のDockerコンテナをVM1上にデプロイします。このpc1-1を擬似PCとして今後も使っていきます。
  
 <img src="images/topology.png">
  
@@ -19,8 +19,8 @@
  
 simple01ディレクトリ内へ移動し、docker compose upコマンドを実行します。以下の結果が出力されれば、VM1内に擬似PCがデプロイされています。
 ```Shell
-$ cd simple01
-$ docker compose up
+(VM1)$ cd simple01
+(VM1)$ docker compose up
 ```
 
 ```
@@ -34,7 +34,7 @@ $ docker compose up
 
 デプロイしたコンテナ情報を見てみます。
 ```
-$ docker ps
+(VM1)$ docker ps
 ```
 
 ```
@@ -46,12 +46,12 @@ CONTAINER ID   IMAGE           COMMAND     CREATED          STATUS          PORT
 
 別のターミナルを開き、以下のようにdocker execコマンドを実行すると擬似PCに接続できます。
 ```Shell
-$ docker exec -it pc1-1 /bin/sh
+(VM1)$ docker exec -it pc1-1 /bin/sh
 ```
 
 「ip a」コマンドを実行すると、PCと同じように擬似PCのネットワーク情報が出力されます。
 ```Shell
-/ # ip a
+(pc1-1)/ # ip a
 ```
 
 ```
@@ -71,7 +71,7 @@ $ docker exec -it pc1-1 /bin/sh
 
 終了する際は、コンテナを起動したターミナルをCtrl+Cで止め、docker compose downコマンドを実行して後片付けします。
 ```
-docker compose down
+(VM1)$ docker compose down
 ```
 <br>
 
