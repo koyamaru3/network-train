@@ -139,7 +139,8 @@ a432ba3760a0   host                host      local
 (VM1)$ docker exec -it pc1-1 /bin/sh
 ```
 
-接続した擬似PC内でpc1-2宛てにpingを実行すると応答が返ってきます。
+接続した擬似PC内でpc1-2宛てにpingを実行すると、問題なくpc1-2から応答が返ってくるはずです。
+
 ```Shell
 (pc1-1)/ # ping 10.1.1.102
 PING 10.1.1.102 (10.1.1.102): 56 data bytes
@@ -348,5 +349,25 @@ listening on enp0s5, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 
 <br>
 
-最もシンプルなネットワーク環境が構築できました。[次回の演習](../simple03/README.md)では2台のPC間にルータを挟んでみます。
+最後にですが、今回よりコンテナのデプロイや削除をシェルスクリプトで実行するように変更しました。
+ 
+今後、VMごとにデプロイする構成が変わるため、VMごとにデプロイと削除用のシェルスクリプトを用意し、簡単に実行できるようにしています（といってもシェルスクリプト内ではcompose.yamlと.envファイルを指定してdocker composeコマンドを実行しているだけですが）
+
+デプロイ用シェル（up1.sh）
+```Shell
+#!/bin/bash
+
+sudo docker compose -f ./VM1_compose.yaml --env-file ../.env up 
+```
+
+削除用シェル（down.sh）
+```Shell
+#!/bin/sh
+
+sudo docker compose -f VM1_compose.yaml down
+```
+
+<br>
+
+今回の演習を通じて、最もシンプルなネットワーク環境が構築できました。[次回の演習](../simple03/README.md)では2台のPC間にルータを挟んでみます。
 
