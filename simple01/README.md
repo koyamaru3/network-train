@@ -23,7 +23,7 @@ VM1上のsimple01ディレクトリ内へ移動し、docker compose upコマン�
 (VM1)$ docker compose up
 ```
 
-```
+```Shell
 （実行結果）
 
 [+] Running 2/2
@@ -35,11 +35,11 @@ VM1上のsimple01ディレクトリ内へ移動し、docker compose upコマン�
 <br>
 
 デプロイしたコンテナ情報を見てみます。
-```
+```Shell
 (VM1)$ docker ps
 ```
 
-```
+```Shell
 （実行結果）
 
 CONTAINER ID   IMAGE           COMMAND     CREATED          STATUS          PORTS     NAMES
@@ -58,7 +58,7 @@ CONTAINER ID   IMAGE           COMMAND     CREATED          STATUS          PORT
 (pc1-1)/ # ip a
 ```
 
-```
+```Shell
 （実行結果）
 
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN qlen 1000
@@ -76,9 +76,18 @@ CONTAINER ID   IMAGE           COMMAND     CREATED          STATUS          PORT
 <br>
 
 終了する際は、コンテナを起動したターミナルをCtrl+Cで止め、docker compose downコマンドを実行して後片付けします。
-```
+
+```Shell
 (VM1)$ docker compose down
 ```
+
+```
+（実行結果）
+[+] Running 2/2
+ ✔ Container pc1-1           Removed
+ ✔ Network simple01_default  Removed
+```
+
 <br>
 
 ## 解説

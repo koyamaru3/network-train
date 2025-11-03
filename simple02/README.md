@@ -15,6 +15,24 @@
 ## 動作確認
 今回も解説は後回しにして、先にpingの動作確認を行ってみます。
  
+VM1上のsimple02ディレクトリ内へ移動し、up1.shという名前のシェルスクリプトを実行します。以下の結果が出力されれば、VM1内に擬似PCがデプロイされています。
+
+```Shell
+(VM1)$ cd network-train/simple02
+(VM1)$ ./up1.sh
+```
+
+```
+（実行結果）
+
+[+] Running 3/3
+ ✔ Network simple02_vlan1001  Created
+ ✔ Container pc1-2            Created
+ ✔ Container pc1-1            Created
+Attaching to pc1-1, pc1-2
+```
+
+
 以下を実行し、擬似PCを一斉起動させます。
 ```Shell
 cd simple01
