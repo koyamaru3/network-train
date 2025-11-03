@@ -17,9 +17,9 @@
 ## 動作確認
 解説は後回しにして、先に擬似PCのデプロイを行ってみます。
  
-simple01ディレクトリ内へ移動し、docker compose upコマンドを実行します。以下の結果が出力されれば、VM1内に擬似PCがデプロイされています。
+VM1上のsimple01ディレクトリ内へ移動し、docker compose upコマンドを実行します。以下の結果が出力されれば、VM1内に擬似PCがデプロイされています。
 ```Shell
-(VM1)$ cd simple01
+(VM1)$ cd network-train/simple01
 (VM1)$ docker compose up
 ```
 
