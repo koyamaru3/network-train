@@ -24,7 +24,7 @@ services:
       - /bin/sh
       - -c
       - |
-        ip route del default via 10.1.1.253
+        ip route del default via 10.1.1.254
         ip route add default via 10.1.1.1
         tail -f /dev/null
     depends_on:
@@ -44,7 +44,7 @@ services:
       - /bin/sh
       - -c
       - |
-        ip route del default via 10.1.1.253
+        ip route del default via 10.1.1.254
         ip route add default via 10.1.1.1
         tail -f /dev/null
     depends_on:
