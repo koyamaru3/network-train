@@ -1,7 +1,7 @@
 # 2. 擬似PCをネットワークに接続する
 
 ## 概要
-2台の擬似PCを同じネットワークに接続し、擬似PC間でping確認を行います。
+2台の擬似PCを同じネットワークに接続し、擬似PC間でping確認を行ってみます。
  
 <br>
 
@@ -15,7 +15,7 @@
 ## 動作確認
 今回も解説は後回しにして、先にpingの動作確認を行ってみます。
  
-VM1上のsimple02ディレクトリ内へ移動し、up1.shという名前のシェルスクリプトを実行します。以下の結果が出力されれば、VM1内に擬似PCがデプロイされています。
+VM1上のsimple02ディレクトリ内へ移動し、「up1.sh」という名前のシェルスクリプトを実行します。以下の結果が出力されれば、VM1内に擬似PC2台とネットワークがデプロイされています。
 
 ```Shell
 (VM1)$ cd network-train/simple02
@@ -32,31 +32,133 @@ VM1上のsimple02ディレクトリ内へ移動し、up1.shという名前のシ
 Attaching to pc1-1, pc1-2
 ```
 
+<br>
 
-以下を実行し、擬似PCを一斉起動させます。
+デプロイしたコンテナ情報を見てみます。
 ```Shell
-cd simple01
-./up.sh
+(VM1)$ docker ps
 ```
 
-別のターミナルを開き、pc1のコンテナに入ってpingを実行します。
 ```Shell
-docker exec -it pc1 /bin/sh
+（実行結果）
+
+CONTAINER ID   IMAGE           COMMAND     CREATED          STATUS          PORTS     NAMES
+b0b812d31336   alpine:latest   "/bin/sh"   11 minutes ago   Up 11 minutes             pc1-1
+3fb5670e1a16   alpine:latest   "/bin/sh"   11 minutes ago   Up 11 minutes             pc1-2
 ```
 
-pc2宛てにpingを実行すると応答が返ってきます。
+<br>
+
+コンテナのネットワーク情報も見てみます。
+
 ```Shell
-/ # ping 10.1.1.102
+(VM1)$ docker network ls
+```
+
+```Shell
+（実行結果）
+
+NETWORK ID     NAME                DRIVER    SCOPE
+51da0523259e   bridge              bridge    local
+a432ba3760a0   host                host      local
+0bcb0c5aedd1   none                null      local
+23d9b00b79e4   simple02_vlan1001   macvlan   local
+```
+「simple02_vlan1001」という名前のネットワークが、2台の擬似PCを接続するために新たに作成したネットワークです。
+ 
+このネットワークの詳細情報も見てみます。
+
+```Shell
+(VM1)$ docker inspect simple02_vlan1001
+```
+
+```
+（実行結果）
+[
+    {
+        "Name": "simple02_vlan1001",
+        "Id": "8d54390d00d2f850d9142ec6d7aa45f2c08a7ec14d9ad66f49269370de781c76",
+        "Created": "2025-11-03T17:37:58.293416957+09:00",
+        "Scope": "local",
+        "Driver": "macvlan",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "10.1.1.0/24",
+                    "Gateway": "10.1.1.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "9c0259498676e54a8ae491f838233b93b84469df867fdcef46554626f4b30bff": {
+                "Name": "pc1-1",
+                "EndpointID": "4ce643da031892f8650ed3aff2f6bdcd53b878cd9a48d73ca66f3f0d93bf8c2c",
+                "MacAddress": "02:42:ac:00:01:01",
+                "IPv4Address": "10.1.1.101/24",
+                "IPv6Address": ""
+            },
+            "a6b420d5616af17fd82f6a093c933509aeee2e7cdef03f5e6a45846c6b642c64": {
+                "Name": "pc1-2",
+                "EndpointID": "843f22a83e228c15b975156fbc4fa373795b8ec7aa59ad14c2c3dd9fb58eb121",
+                "MacAddress": "02:42:ac:00:01:02",
+                "IPv4Address": "10.1.1.102/24",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {
+            "parent": "enp0s5.1001"
+        },
+        "Labels": {
+            "com.docker.compose.config-hash": "d08daf53532ee3aba8eda4ea095f20237dfc8263a3a96272a8c332fc7c0da0f5",
+            "com.docker.compose.network": "vlan1001",
+            "com.docker.compose.project": "simple02",
+            "com.docker.compose.version": "2.40.3"
+        }
+    }
+]
+```
+
+<br>
+
+別のターミナルを開き、以下のようにdocker execコマンドを実行し擬似PC「pc1-1」に接続します。
+```Shell
+(VM1)$ docker exec -it pc1-1 /bin/sh
+```
+
+接続した擬似PC pc1-1内でpc1-2宛てにpingを実行すると応答が返ってきます。
+```Shell
+(pc1-1)/ # ping 10.1.1.102
 PING 10.1.1.102 (10.1.1.102): 56 data bytes
-64 bytes from 10.1.1.102: seq=0 ttl=64 time=0.388 ms
-64 bytes from 10.1.1.102: seq=1 ttl=64 time=0.170 ms
-64 bytes from 10.1.1.102: seq=2 ttl=64 time=0.112 ms
+64 bytes from 10.1.1.102: seq=0 ttl=64 time=2.197 ms
+64 bytes from 10.1.1.102: seq=1 ttl=64 time=0.442 ms
+64 bytes from 10.1.1.102: seq=2 ttl=64 time=0.099 ms
 ```
 
-終了する際は、コンテナを起動したターミナルをCtrl+Cで止め、以下を実行して後片付けします。
+終了する際は、コンテナを起動したターミナルをCtrl+Cで止め、「down1.sh」という名前のシェルスクリプトを実行して後片付けします。
+
+```Shell
+(VM1)$ ./down1.sh
 ```
-./down.sh
+
+```Shell
+（実行結果）
+[+] Running 3/3
+ ✔ Container pc1-1            Removed
+ ✔ Container pc1-2            Removed
+ ✔ Network simple02_vlan1001  Removed
 ```
+
 <br>
 
 ## 解説
