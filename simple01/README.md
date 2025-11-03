@@ -53,7 +53,7 @@ CONTAINER ID   IMAGE           COMMAND     CREATED          STATUS          PORT
 (VM1)$ docker exec -it pc1-1 /bin/sh
 ```
 
-「ip a」コマンドを実行すると、PCと同じように擬似PCのネットワーク情報が出力されます。
+接続した擬似PC内で「ip a」コマンドを実行すると、PCと同じように擬似PCのネットワーク情報が出力されます。
 ```Shell
 (pc1-1)/ # ip a
 ```
@@ -112,7 +112,9 @@ compose.yamlのservicesセクションにコンテナの定義を記述します
 | privileged | trueにするとコンテナに特権アクセス権を与える。<br>これにより、通常のコンテナでは制限されるカーネル昨日やデバイスアクセスが可能になる。|
 
 「privileged: true」を設定するとセキュリティリスクが高くなります。この後の演習でルート設定などのネットワーク操作を行う際に必要になるため、「privileged: true」を設定することとします。
- 
+
+<br>
+
 dockerコンテナのデプロイと削除は「docker compose」コマンドを使用します。
 
 ```Shell
@@ -124,6 +126,8 @@ docker compose down
 ```
 実行すると、カレントディレクトリ内のcompose.yamlを読み込んで、記述内容に沿ってDcokerコンテナをデプロイしたり削除したりします。
 
+<br>
+
 dockerコンテナの接続は「docker exec」コマンドを使用します。
 
 ```Shell
@@ -133,5 +137,6 @@ docker exec -it pc1-1 /bin/sh
 「-it」オプションは、「-i」で標準入力(stdin)を開いたままにし、「-t」で擬似端末(TTY)を割り当てます。これにより、コンテナ内で対話的にコマンドを実行できるようになります。
 
 <br>
+
 コンテナを無事に作ることができたところで、[次回の演習](./simple02/README.md)からコンテナが接続するネットワークに触れていきます。
 
