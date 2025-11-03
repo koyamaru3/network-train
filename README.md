@@ -30,6 +30,7 @@ TRAIN_NIC=enp0s5
 
 ## 演習
 
-  1. [擬似PCを構築する](./simple01/README.md)
-  2. [仮想ルータを挟んでみる](./simple02/README.md)
-  3. [仮想ルータから外部NWへ通信できるようにする](./simple03/README.md)
+  1. [Dockerコンテナで擬似PCをデプロイする](./simple01/README.md)
+  2. [擬似PCを構築する](./simple01/README.md)
+  3. [仮想ルータを挟んでみる](./simple02/README.md)
+  4. [仮想ルータから外部NWへ通信できるようにする](./simple03/README.md)
