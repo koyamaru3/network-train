@@ -32,6 +32,8 @@ simple01ディレクトリ内へ移動し、docker compose upコマンドを実�
  Attaching to pc1-1
 ```
 
+<br>
+
 デプロイしたコンテナ情報を見てみます。
 ```
 (VM1)$ docker ps
@@ -68,6 +70,8 @@ CONTAINER ID   IMAGE           COMMAND     CREATED          STATUS          PORT
     inet 172.18.0.2/16 brd 172.18.255.255 scope global eth0
        valid_lft forever preferred_lft forever
 ```
+
+<br>
 
 終了する際は、コンテナを起動したターミナルをCtrl+Cで止め、docker compose downコマンドを実行して後片付けします。
 ```
