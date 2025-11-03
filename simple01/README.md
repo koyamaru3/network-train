@@ -34,7 +34,7 @@ VM1上のsimple01ディレクトリ内へ移動し、docker compose upコマン�
 
 <br>
 
-デプロイしたコンテナ情報を見てみます。
+別のターミナルを開き、デプロイしたコンテナ情報を見てみます。
 ```Shell
 (VM1)$ docker ps
 ```
@@ -48,7 +48,7 @@ CONTAINER ID   IMAGE           COMMAND     CREATED          STATUS          PORT
 
 <br>
 
-別のターミナルを開き、以下のようにdocker execコマンドを実行すると擬似PCに接続できます。
+以下のようにdocker execコマンドを実行すると擬似PCに接続できます。
 ```Shell
 (VM1)$ docker exec -it pc1-1 /bin/sh
 ```
