@@ -28,7 +28,7 @@ services:
         ip route add default via 10.1.1.1
         tail -f /dev/null
     depends_on:
-      - "r1"
+      - "r1-1"
   pc1-2:
     image: alpine:latest
     container_name: pc1-2
@@ -48,7 +48,7 @@ services:
         ip route add default via 10.1.1.1
         tail -f /dev/null
     depends_on:
-      - "r1"
+      - "r1-1"
   r1-1:
     image: frrouting/frr:v8.4.1
     container_name: r1-1
