@@ -34,7 +34,7 @@ VM1上のsimple01ディレクトリ内へ移動し、docker compose upコマン�
 
 <br>
 
-別のターミナルを開き、デプロイしたコンテナ情報を見てみます。
+別のターミナルを開き、デプロイしたコンテナ情報を見てみましょう。
 ```Shell
 (VM1)$ docker ps
 ```
@@ -53,7 +53,7 @@ CONTAINER ID   IMAGE           COMMAND     CREATED          STATUS          PORT
 (VM1)$ docker exec -it pc1-1 /bin/sh
 ```
 
-接続した擬似PC内で「ip a」コマンドを実行すると、PCと同じように擬似PCのネットワーク情報が出力されます。
+接続した擬似PC内で「ip a」コマンドを実行すると、PCと同じように擬似PCのネットワーク情報が出力されていますね。
 ```Shell
 (pc1-1)/ # ip a
 ```
@@ -147,5 +147,5 @@ docker exec -it pc1-1 /bin/sh
 
 <br>
 
-コンテナを無事に作ることができたところで、[次回の演習](../simple02/README.md)からコンテナが接続するネットワークに触れていきます。
+コンテナを無事に作ることができたところで、[次回の演習](../simple02/README.md)からコンテナが接続するネットワークに触れていきますね。
 
