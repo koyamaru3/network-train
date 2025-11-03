@@ -1,8 +1,8 @@
 services:
   pc1-1:
     image: alpine:latest
-    container_name: pc1
-    hostname: pc1
+    container_name: pc1-1
+    hostname: pc1-1
     tty: true
     stdin_open: true
     privileged: true

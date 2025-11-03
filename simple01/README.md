@@ -21,6 +21,10 @@ simple01内のup1.shスクリプトを実行すると、VM1内に擬似PCがデ�
 ```Shell
 cd simple01
 ./up1.sh
+[+] Running 2/2
+ ✔ Network simple01_default  Created
+ ✔ Container pc1.            Created
+ Attaching to pc1
 ```
 
 別のターミナルを開き、pc1のコンテナに入ってpingを実行します。
