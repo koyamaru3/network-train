@@ -46,6 +46,8 @@ CONTAINER ID   IMAGE           COMMAND     CREATED          STATUS          PORT
 9b65cb413fb7   alpine:latest   "/bin/sh"   17 minutes ago   Up 17 minutes             pc1-1
 ```
 
+<br>
+
 別のターミナルを開き、以下のようにdocker execコマンドを実行すると擬似PCに接続できます。
 ```Shell
 (VM1)$ docker exec -it pc1-1 /bin/sh
