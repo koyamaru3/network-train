@@ -81,7 +81,7 @@ CONTAINER ID   IMAGE           COMMAND     CREATED          STATUS          PORT
 (VM1)$ docker compose down
 ```
 
-```
+```Shell
 （実行結果）
 [+] Running 2/2
  ✔ Container pc1-1           Removed
