@@ -10,15 +10,6 @@ services:
       vlan1:
         ipv4_address: 10.1.1.101
         mac_address: "02:42:ac:00:01:01"
-    command:
-      - /bin/sh
-      - -c
-      - |
-        ip route del default via 10.1.1.253
-        ip route add default via 10.1.1.1
-        tail -f /dev/null
-    depends_on:
-      - "r1"
   pc2:
     image: alpine:latest
     container_name: pc2
@@ -30,28 +21,6 @@ services:
       vlan1:
         ipv4_address: 10.1.1.102
         mac_address: "02:42:ac:00:01:02"
-    command:
-      - /bin/sh
-      - -c
-      - |
-        ip route del default via 10.1.1.253
-        ip route add default via 10.1.1.1
-        tail -f /dev/null
-    depends_on:
-      - "r1"
-  r1:
-    image: frrouting/frr:v8.4.1
-    container_name: r1
-    hostname: r1
-    privileged: true
-    volumes:
-      - ./conf/daemons:/etc/frr/daemons:ro
-      - ./conf/vtysh.conf:/etc/frr/vtysh.conf:ro
-      - ./conf/r1_frr.conf:/etc/frr/frr.conf:ro
-    networks:
-      vlan1:
-        ipv4_address: 10.1.1.1
-        mac_address: "02:42:ac:00:01:11"
 
 networks:
   vlan1:
@@ -61,4 +30,4 @@ networks:
     ipam:
       config:
         - subnet: 10.1.1.0/24
-          gateway: 10.1.1.253
+          gateway: 10.1.1.1

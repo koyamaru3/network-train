@@ -52,6 +52,8 @@ services:
       vlan1:
         ipv4_address: 10.1.1.1
         mac_address: "02:42:ac:00:01:11"
+      exnet:
+        ipv4_address: ${EXNET_IF}
 
 networks:
   vlan1:
@@ -62,3 +64,12 @@ networks:
       config:
         - subnet: 10.1.1.0/24
           gateway: 10.1.1.253
+  exnet:
+    driver: macvlan
+    driver_opts:
+      parent: ${TRAIN_NIC}
+    ipam:
+      config:
+        - subnet: ${EXNET}
+          gateway: ${EXNET_GW}
+
