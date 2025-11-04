@@ -1,0 +1,75 @@
+networks:
+  bridge_net:
+    driver: macvlan
+    driver_opts:
+      parent: ${VM2_IF}
+    ipam:
+      config:
+        - subnet: 192.168.0.0/24
+          gateway: 192.168.0.254
+  vlan2001:
+    driver: macvlan
+    driver_opts:
+      parent: ${VM2_IF}.2001
+    ipam:
+      config:
+        - subnet: 20.1.1.0/24
+          gateway: 20.1.1.254
+
+services:
+  pc2-1:
+    image: alpine:latest
+    container_name: pc2-1
+    hostname: pc2-1
+    tty: true
+    stdin_open: true
+    privileged: true
+    networks:
+      vlan2001:
+        ipv4_address: 20.1.1.101
+        mac_address: "02:42:ac:00:02:01"
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ip route del default via 20.1.1.254
+        ip route add default via 20.1.1.1
+        tail -f /dev/null
+    depends_on:
+      - "r2-1"
+  pc2-2:
+    image: alpine:latest
+    container_name: pc2-2
+    hostname: pc2-2
+    tty: true
+    stdin_open: true
+    privileged: true
+    networks:
+      vlan2001:
+        ipv4_address: 20.1.1.102
+        mac_address: "02:42:ac:00:02:02"
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ip route del default via 20.1.1.254
+        ip route add default via 20.1.1.1
+        tail -f /dev/null
+    depends_on:
+      - "r2-1"
+  r2-1:
+    image: frrouting/frr:v8.4.1
+    container_name: r2-1
+    hostname: r2-1
+    privileged: true
+    volumes:
+      - ./conf/daemons:/etc/frr/daemons:ro
+      - ./conf/vtysh.conf:/etc/frr/vtysh.conf:ro
+      - ./conf/r2-1_frr.conf:/etc/frr/frr.conf:ro
+    networks:
+      bridge_net:
+        ipv4_address: 192.168.0.252
+        mac_address: "02:42:ac:0a:02:11"
+      vlan2001:
+        ipv4_address: 20.1.1.1
+        mac_address: "02:42:ac:00:02:11"

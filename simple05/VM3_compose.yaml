@@ -1,0 +1,75 @@
+networks:
+  bridge_net:
+    driver: macvlan
+    driver_opts:
+      parent: ${VM3_IF}
+    ipam:
+      config:
+        - subnet: 192.168.0.0/24
+          gateway: 192.168.0.254
+  vlan3001:
+    driver: macvlan
+    driver_opts:
+      parent: ${VM3_IF}.3001
+    ipam:
+      config:
+        - subnet: 30.1.1.0/24
+          gateway: 30.1.1.254
+
+services:
+  pc3-1:
+    image: alpine:latest
+    container_name: pc3-1
+    hostname: pc3-1
+    tty: true
+    stdin_open: true
+    privileged: true
+    networks:
+      vlan3001:
+        ipv4_address: 30.1.1.101
+        mac_address: "02:42:ac:00:03:01"
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ip route del default via 30.1.1.254
+        ip route add default via 30.1.1.1
+        tail -f /dev/null
+    depends_on:
+      - "r3-1"
+  pc3-2:
+    image: alpine:latest
+    container_name: pc3-2
+    hostname: pc3-2
+    tty: true
+    stdin_open: true
+    privileged: true
+    networks:
+      vlan3001:
+        ipv4_address: 30.1.1.102
+        mac_address: "02:42:ac:00:03:02"
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ip route del default via 30.1.1.254
+        ip route add default via 30.1.1.1
+        tail -f /dev/null
+    depends_on:
+      - "r3-1"
+  r3-1:
+    image: frrouting/frr:v8.4.1
+    container_name: r3-1
+    hostname: r3-1
+    privileged: true
+    volumes:
+      - ./conf/daemons:/etc/frr/daemons:ro
+      - ./conf/vtysh.conf:/etc/frr/vtysh.conf:ro
+      - ./conf/r3-1_frr.conf:/etc/frr/frr.conf:ro
+    networks:
+      bridge_net:
+        ipv4_address: 192.168.0.253
+        mac_address: "02:42:ac:0a:03:11"
+      vlan3001:
+        ipv4_address: 30.1.1.1
+        mac_address: "02:42:ac:00:03:11"
